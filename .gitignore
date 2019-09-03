@@ -1,3 +1,7 @@
+# Project ignore files
+data/web_project_media/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
