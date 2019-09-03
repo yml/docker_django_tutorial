@@ -1,11 +1,7 @@
-echo "Hello World"
 source /venv/bin/activate
-echo "Hello World"
-echo "hello from container"
-history -w
-history --help
-history -a
-source /venv/bin/activate
-django-admin tes
-django-admin tests
 django-admin test
+/venv/bin/python /root/.vscode-server/extensions/ms-python.python-2019.8.30787/pythonFiles/ptvsd_launcher.py --default --client --host localhost --port 38065 /venv/bin/django-admin test 
+source /venv/bin/activate
+/venv/bin/python /root/.vscode-server/extensions/ms-python.python-2019.8.30787/pythonFiles/ptvsd_launcher.py --default --client --host localhost --port 32787 /venv/bin/django-admin runserver --noreload --nothreading 0.0.0.0:8001 
+django-admin migrate
+django-admin dbshell

@@ -7,7 +7,7 @@ ENV PATH=/venv/bin:${PATH} VIRTUAL_ENV=/venv DJANGO_SETTINGS_MODULE=nols_cms.set
 
 # Pre-reqs
 RUN set -ex && \
-    apt-get update -qq && apt-get install --no-install-recommends -y libmemcached-dev && \
+    apt-get update -qq && apt-get install --no-install-recommends -y libmemcached-dev postgresql-client && \
     python -m venv /venv && /venv/bin/pip install -U pip
 
 COPY ./requirements.txt ./requirements.txt
