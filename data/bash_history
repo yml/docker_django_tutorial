@@ -1,0 +1,11 @@
+echo "Hello World"
+source /venv/bin/activate
+echo "Hello World"
+echo "hello from container"
+history -w
+history --help
+history -a
+source /venv/bin/activate
+django-admin tes
+django-admin tests
+django-admin test

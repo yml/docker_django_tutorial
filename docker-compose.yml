@@ -1,0 +1,34 @@
+version: "3"
+services:
+  db:
+    image: postgres:11.5-alpine
+    volumes:
+      - db:/var/lib/postgresql/data
+      - $PWD/data/db_dumps:/db_dumps
+    environment:
+      POSTGRES_USER: django_tutorial_db
+
+  app:
+    build:
+      context: python-django-tutorial
+      dockerfile: Dockerfile
+    restart: on-failure
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+      - 8001:8001
+    volumes:
+      - ./python-django-tutorial:/app
+      - /app/python_django_tutorial/python_django_tutorial.egg-info
+      - $PWD/data/web_project_media:/venv/var/web_project/media
+      - $PWD/data/bash_history:/root/.bash_history
+    command: django-admin runserver 0.0.0.0:8000
+    environment:
+      DATABASE_URL: postgres://django_tutorial_db:postgres@db:5432/django_tutorial_db
+      DJANGO_SETTINGS_MODULE: web_project.settings
+      STATIC_ROOT: /venv/var/web_project/media
+    env_file: .docker-env
+
+volumes:
+  db:

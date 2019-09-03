@@ -1,0 +1,9 @@
+{
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/app/",
+	"extensions": ["ms-python.python"],
+	"settings": {
+		"python.pythonPath": "/venv/bin/python"
+	}
+}
