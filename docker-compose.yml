@@ -3,7 +3,7 @@ services:
   db:
     image: postgres:11.5-alpine
     volumes:
-      - db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data:cached
       - $PWD/data/db_dumps:/db_dumps
     environment:
       POSTGRES_USER: django_tutorial_db
@@ -19,10 +19,10 @@ services:
       - 8000:8000
       - 8001:8001
     volumes:
-      - ./python-django-tutorial:/app
+      - ./python-django-tutorial:/app:delegated
       - /app/python_django_tutorial/python_django_tutorial.egg-info
-      - $PWD/data/web_project_media:/venv/var/web_project/media
-      - $PWD/data/bash_history:/root/.bash_history
+      - $PWD/data/web_project_media:/venv/var/web_project/media:cached
+      - $PWD/data/bash_history:/root/.bash_history:cached
     command: django-admin runserver 0.0.0.0:8000
     environment:
       DATABASE_URL: postgres://django_tutorial_db:postgres@db:5432/django_tutorial_db
