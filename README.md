@@ -12,6 +12,51 @@ For this tutorial we are going to only work with 2 containers:
 
 The database config is passed to the Django application via environment variable.
 
+## Performance optimization
+
+This is an extremely vast area and it is important to understand that you can improve performances on multiple angles.
+
+### Build time 
+
+You can have an impact on this factor by reducing the size of your images and being more efficient in the construction of your Dockerfile. An effective use of docker caching layer will make a huge difference.
+
+### Mounted volume
+
+At Lincoln Loop, as we started to use docker more and more we realized that not all operating systems are equals with regards to performances. 
+
+On Linux systems, Docker directly leverages the kernel of the host system, and file system mounts are native. On Windows and Mac, it’s slightly different. These operating systems do not provide a Linux Kernel, so Docker starts a virtual machine with a small Linux installed and runs Docker containers in there.  File system mounts are also not possible natively and need a “helper-system” in between. This “helper-system” has a significant measurable overhead.
+
+In the recent version, starting with Docker 17.06 CE Stable, you can configure container-and-host consistency requirements for bind-mounted directories in Compose files to allow for better performance on read/write of volume mounts. These options address issues specific to OSXFS file sharing, and therefore are only applicable on Docker Desktop for Mac.
+You can still use the same docker-compose.yml file on Linux but they do not affect. 
+
+The flags are:
+
+* **consistent:** Full consistency. The container runtime and the host maintain an identical view of the mount at all times. This is the default.
+* **cached:** The host’s view of the mount is authoritative. There may be delays before updates made on the host are visible within a container.
+* **delegated:** The container runtime’s view of the mount is authoritative. There may be delays before updates made in a container are visible on the host.
+
+Slow “hot reloading” after a code change and database performance have been tasks that have significantly been improved by tunning the parameter above. 
+
+Here it is an example of how you would apply it in your docker-compose.yml
+
+```
+
+version: "3"
+services:
+  db:
+    image: postgres:11.5-alpine
+    volumes:
+      - db:/var/lib/postgresql/data**:cached**
+      - $PWD/data/db_dumps:/db_dumps
+[...]
+  app:
+   [...]
+    volumes:
+      - ./python-django-tutorial:/app**:delegated**
+      - /app/python_django_tutorial/python_django_tutorial.egg-info
+      - $PWD/data/web_project_media:/venv/var/web_project/media:cached
+      - $PWD/data/bash_history:/root/.bash_history**:cached**
+```
 
 ## Building the images
 
@@ -132,7 +177,7 @@ Ctrl+shif +b will run your test suite.
 
 #### Debugger
 
-There is 2 activity where it is really handy to observe the code behavior under a debugger. Obviously, you can still use `import pdb; pdb.set_trace()` but if you are more a GUI person you might be interested in the following customization that will let you take advantage of the vscode built in debugger UI. This time you will need to modify the `launch.json`
+There are 2 activity where it is really handy to observe the code behavior under a debugger. Obviously, you can still use `import pdb; pdb.set_trace()` but if you are more a GUI person you might be interested in the following customization that will let you take advantage of the vscode built in debugger UI. This time you will need to modify the `launch.json`
 
 
 ```
@@ -171,7 +216,6 @@ In a similar way ctrl+shit+D and then selecting Django runserver will start your
 Obviously in the setup above I have committed few files that are in the `.gitignore` list on my usual project:
 
 * bash_history
-* the files in the .vscode and the .devcontainer.json. If most of your team use vscode it might be useful to share them between the team members.
+* the files in the `.vscode` and the `.devcontainer.json`. If most of your team use vscode it might be useful to share them between the team members.
 
-Please do not hesitate to let me know what is your preferred tricks.
-
+Please do not hesitate to let me know what your preferred trick is.
