@@ -35,7 +35,7 @@ The flags are:
 * **cached:** The host’s view of the mount is authoritative. There may be delays before updates made on the host are visible within a container.
 * **delegated:** The container runtime’s view of the mount is authoritative. There may be delays before updates made in a container are visible on the host.
 
-Slow “hot reloading” after a code change and database performance have been tasks that have significantly been improved by tunning the parameter above. 
+Slow “hot reloading” after a code change and database performance have been tasks that have significantly improved by tuning the parameter above. 
 
 Here it is an example of how you would apply it in your docker-compose.yml
 
@@ -57,6 +57,20 @@ services:
       - $PWD/data/web_project_media:/venv/var/web_project/media:cached
       - $PWD/data/bash_history:/root/.bash_history**:cached**
 ```
+
+
+## Permissions of file and directory created in a container
+
+Depending on your workflow the fact that the files and directories created inside docker are own by `root` can be annoying.
+
+You can work around this by making sure that they are created under your user group.
+
+```
+sudo chown -R $USER:$GID .
+find . -type d -exec chmod g+s {} \;
+find . -type d -exec setfacl -d -m u::rwx,g::rwx,o::r-x {} \;
+find . -type f -exec chmod g+w {} \;
+```  
 
 ## Building the images
 
@@ -99,6 +113,51 @@ Operations to perform:
   Apply all migrations: admin, auth, contenttypes, hello, sessions
 Running migrations:
   No migrations to apply.
+```
+
+## Volume snapshotting
+
+ZFS docker integration can mean multiple things. There are at least 2 other options :
+* [ZFS storage driver](https://docs.docker.com/storage/storagedriver/zfs-driver/)
+* [docker-zfs-plugin](https://github.com/TrilliumIT/docker-zfs-plugin)
+
+The second option above let you cover a similar usecase but is harder to setup and more intrusive in your docker-compose file or force you to use a legacy feature only available in previous releases.
+
+We want to cover the following use case: be able to snapshot the database volume containing postgres data in a known state (snapshot-foo). The do some work add some data do some migration. Finally rollback to the previous known state (snapshot foo).
+
+Create a large file that will be used to create your zfs volume
+
+```
+dd if=/dev/zero of=/home/yml/Dropbox/Devs/docker_django_tutorial/data/pg_data.img bs=1G count=1
+```
+
+Create the ZFS volume and mount it to the expected location by your postgres docker service. In order to do this you need to use docker-compose path based volume instead of named volume because you want to control the location of `PG_data`
+ 
+```
+ sudo zpool create -f zpool-docker_django_tutorial_db -m /home/yml/Dropbox/Devs/docker_django_tutorial/data/pg_data /home/yml/Dropbox/Devs/docker_django_tutorial/data/pg_data.img
+```
+
+Start you docker compose environment and migrate your database to the latest state.
+
+```
+docker-compose up run app django-admin migrate
+```
+
+Take a snapshot of your db volume
+
+```
+docker-compose down
+sudo zfs snapshot zpool-docker_django_tutorial_db@initial_migration
+```
+
+Do some work modify your database 
+Rollback to previous snapshot
+
+```
+docker-compose down
+sudo zfs list -t snapshot
+sudo zfs rollback zpool-docker_django_tutorial_db@initial_migration
+ 
 ```
 
 ## Vscode integration
@@ -206,9 +265,13 @@ There are 2 activity where it is really handy to observe the code behavior under
             ],
             "django": true
         }
+
+
 ```
 
 ctrl+shift+D and then selecting `Django test` will start the test suite under the control of the debugger. 
+
+
 
 
 In a similar way ctrl+shit+D and then selecting Django runserver will start your application on the port 8001. You can access it via your browser http://localhost:8001 and while you navigate your code will run under the control of the debugger.
