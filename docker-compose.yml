@@ -3,7 +3,7 @@ services:
   db:
     image: postgres:11.5-alpine
     volumes:
-      - db:/var/lib/postgresql/data:cached
+      - $PWD/data/pg_data:/var/lib/postgresql/data:cached
       - $PWD/data/db_dumps:/db_dumps
     environment:
       POSTGRES_USER: django_tutorial_db
@@ -29,6 +29,4 @@ services:
       DJANGO_SETTINGS_MODULE: web_project.settings
       STATIC_ROOT: /venv/var/web_project/media
     env_file: .docker-env
-
-volumes:
-  db:
+    
