@@ -3,6 +3,7 @@
 This is a step by step tutorial on how to setup docker based local environment that is well suited for day to day development.
 Most of the time a local environment setup requires to work with multiple docker containers. Each of these container needs to share some information and start in a well-defined order and predictable order. In order to do this, I like to rely on [docker-compose](https://docs.docker.com/compose/) and a common `dotenv` file.
 
+![Workflow CI badge](https://github.com/yml/docker_django_tutorial/workflows/Docker Django Tutorial CI/badge.svg)
 
 ## docker-compose.yml
 
