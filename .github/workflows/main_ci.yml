@@ -1,0 +1,15 @@
+name: CI
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+    steps:
+    - uses: actions/checkout@master
+    - name: `Up` the docker-compose services
+      run: docker-compose up -d
+    - name: Run the test suite
+      run: docker-compose run app bash -c "django-admin test --no-input"
+    - name: Run the migrations
+      run: docker-compose run app bash -c "django-admin migrate --no-input"
