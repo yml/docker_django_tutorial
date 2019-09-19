@@ -23,7 +23,7 @@ You can have an impact on this factor by reducing the size of your images and be
 
 ### Mounted volume
 
-At Lincoln Loop, as we started to use docker more and more we realized that not all operating systems are equals with regards to performances. 
+At Lincoln Loop, as we started to use docker more and more we realized that not all operating systems are equal with regards to performances. 
 
 On Linux systems, Docker directly leverages the kernel of the host system, and file system mounts are native. On Windows and Mac, it’s slightly different. These operating systems do not provide a Linux Kernel, so Docker starts a virtual machine with a small Linux installed and runs Docker containers in there.  File system mounts are also not possible natively and need a “helper-system” in between. This “helper-system” has a significant measurable overhead.
 
