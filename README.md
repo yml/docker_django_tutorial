@@ -41,7 +41,6 @@ Slow “hot reloading” after a code change and database performance have been 
 Here it is an example of how you would apply it in your docker-compose.yml
 
 ```
-
 version: "3"
 services:
   db:
@@ -68,9 +67,8 @@ You can work around this by making sure that they are created under your user gr
 
 ```
 sudo chown -R $USER:$GID .
-find . -type d -exec chmod g+s {} \;
+find . -type d -exec chmod g+sw {} \;
 find . -type d -exec setfacl -d -m u::rwx,g::rwx,o::r-x {} \;
-find . -type f -exec chmod g+w {} \;
 ```  
 
 ## Building the images
@@ -114,6 +112,32 @@ Operations to perform:
   Apply all migrations: admin, auth, contenttypes, hello, sessions
 Running migrations:
   No migrations to apply.
+```
+
+## Setting up  an automation workflow with Github Actions
+
+[Github actions](https://github.com/features/actions) let you build an automation workflow based on the *docker-compose* environment described in this repository.
+
+The workflow below runs your test suite and test your migrations on every code push.
+
+```
+name: Docker-Django-Tutorial-CI
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: "`Up` the docker-compose services"
+      run: |
+        touch .docker-env
+        docker-compose up -d
+    - name: Run the test suite
+      run: docker-compose run app bash -c "django-admin test --no-input"
+    - name: Run the migrations
+      run: docker-compose run app bash -c "django-admin migrate --no-input"
 ```
 
 ## Volume snapshotting
@@ -208,7 +232,6 @@ From now on there is an infinity of things that you can customize to increase yo
 In vscode you can define custom tasks, I like to override the default build task to run the Django test suite. You can do this by adding the following snippet to your `tasks.json`
 
 
-
 ```
 
        {
@@ -228,11 +251,9 @@ In vscode you can define custom tasks, I like to override the default build task
                "clear": false
            }
        }
-
 ```
 
 Ctrl+shif +b will run your test suite.
-
 
 
 #### Debugger
@@ -241,39 +262,34 @@ There are 2 activity where it is really handy to observe the code behavior under
 
 
 ```
-        {
-            "name": "Django runserver",
-            "type": "python",
-            "request": "launch",
-            "program": "/venv/bin/django-admin",
-            "console": "integratedTerminal",
-            "args": [
-                "runserver",
-                "--noreload",
-                "--nothreading",
-                "0.0.0.0:8001"
-            ],
-            "django": true
-        },
-        {
-            "name": "Django test",
-            "type": "python",
-            "request": "launch",
-            "program": "/venv/bin/django-admin",
-            "console": "integratedTerminal",
-            "args": [
-                "test"
-            ],
-            "django": true
-        }
-
-
+  {
+      "name": "Django runserver",
+      "type": "python",
+      "request": "launch",
+      "program": "/venv/bin/django-admin",
+      "console": "integratedTerminal",
+      "args": [
+          "runserver",
+          "--noreload",
+          "--nothreading",
+          "0.0.0.0:8001"
+      ],
+      "django": true
+  },
+  {
+      "name": "Django test",
+      "type": "python",
+      "request": "launch",
+      "program": "/venv/bin/django-admin",
+      "console": "integratedTerminal",
+      "args": [
+          "test"
+      ],
+      "django": true
+  }
 ```
 
 ctrl+shift+D and then selecting `Django test` will start the test suite under the control of the debugger. 
-
-
-
 
 In a similar way ctrl+shit+D and then selecting Django runserver will start your application on the port 8001. You can access it via your browser http://localhost:8001 and while you navigate your code will run under the control of the debugger.
 
