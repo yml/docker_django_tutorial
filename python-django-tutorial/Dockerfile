@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM smileychris/pywatchman:3.7-slim
 
 
 # Copy the app files to a folder and run it from there
@@ -7,7 +7,7 @@ ENV PATH=/venv/bin:${PATH} VIRTUAL_ENV=/venv DJANGO_SETTINGS_MODULE=nols_cms.set
 
 # Pre-reqs
 RUN set -ex && \
-    apt-get update -qq && apt-get install --no-install-recommends -y libmemcached-dev postgresql-client && \
+    apt-get update -qq && apt-get install --no-install-recommends -y libmemcached-dev postgresql-client libpq-dev python-dev build-essential && \
     python -m venv /venv && /venv/bin/pip install -U pip
 
 COPY ./requirements.txt ./requirements.txt
@@ -16,7 +16,7 @@ COPY ./setup.py ./setup.py
 COPY ./python_django_tutorial/__init__.py ./python_django_tutorial/manage.py  ./python_django_tutorial/
 
 RUN pip install -r requirements.txt -e .
-RUN pip install pylint black
+RUN pip install pylint black pywatchman
 
 COPY . .
 CMD manage.py runserver 0.0.0.0:8000
