@@ -1,5 +1,6 @@
 # Project ignore files
 data/web_project_media/
+data/
 
 
 # Byte-compiled / optimized / DLL files
