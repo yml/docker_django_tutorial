@@ -1,0 +1,25 @@
+version: "3.3"
+services:
+  db:
+    image: postgres:11.5-alpine
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: django_tutorial_db
+
+  app:
+    image: gwadeloop/python-django-tutorial
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+      - 8001:8001
+    command: django-admin runserver 0.0.0.0:8000
+    environment:
+      DATABASE_URL: postgres://django_tutorial_db:postgres@db:5432/django_tutorial_db
+      DJANGO_SETTINGS_MODULE: web_project.settings
+      STATIC_ROOT: /venv/var/web_project/media
+    env_file: .docker-env
+volumes:
+  pg_data:

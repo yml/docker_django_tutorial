@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: /snap/kompose/1/./kompose-linux-amd64 convert -f ../production.yml
+    kompose.version: 1.18.0 (06a2e56)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: app
+  name: app
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: app
+    spec:
+      containers:
+      - args:
+        - django-admin
+        - runserver
+        - 0.0.0.0:8000
+        env:
+        - name: DATABASE_URL
+          value: postgres://django_tutorial_db:postgres@db:5432/django_tutorial_db
+        - name: DJANGO_SETTINGS_MODULE
+          value: web_project.settings
+        - name: STATIC_ROOT
+          value: /venv/var/web_project/media
+        image: gwadeloop/python-django-tutorial
+        name: app
+        ports:
+        - containerPort: 8000
+        - containerPort: 8001
+        resources: {}
+      restartPolicy: Always
+status: {}
