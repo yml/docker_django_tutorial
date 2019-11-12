@@ -185,6 +185,13 @@ sudo zfs rollback zpool-docker_django_tutorial_db@initial_migration
  
 ```
 
+Unmount and detroy the zfs pool
+
+```
+sudo zfs unmount zpool-docker_django_tutorial_db
+sudo zpool destroy zpool-docker_django_tutorial_db
+```
+
 ## Vscode integration
 
 All the above is probably enough if you like to develop with a lightweight editor but in the following section, I would like to showcase how you could work with the setup above from within vscode.
