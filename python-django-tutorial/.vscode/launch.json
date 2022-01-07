@@ -15,7 +15,8 @@
             "name": "Django runserver",
             "type": "python",
             "request": "launch",
-            "program": "/venv/bin/django-admin",
+            "python": "/venv/bin/python3",
+            "program": "/venv/bin/manage.py",
             "console": "integratedTerminal",
             "args": [
                 "runserver",
@@ -29,12 +30,13 @@
             "name": "Django test",
             "type": "python",
             "request": "launch",
+            "python": "/venv/bin/python3",
             "program": "/venv/bin/django-admin",
             "console": "integratedTerminal",
             "args": [
                 "test"
             ],
             "django": true
-        }
+        },
     ]
 }
